@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/Fragments"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <!--Контейнер под фрагменты -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/container_fragm"
+        android:minHeight="630dp">
+
+    </FrameLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Кратко"
+        android:id="@+id/currentTask"
+        android:layout_below="@id/container_fragm"
+        android:minWidth="150dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="30dp"
+        android:layout_alignParentBottom="true"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Подробно"
+        android:id="@+id/finishTask"
+        android:layout_below="@id/container_fragm"
+        android:layout_toEndOf="@id/currentTask"
+        android:layout_marginEnd="30dp"
+        android:minWidth="150dp"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>
