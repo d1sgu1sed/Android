@@ -1,13 +1,18 @@
 package com.example.fragment
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
 import com.google.gson.JsonParser
@@ -34,6 +39,7 @@ private const val ARG_PARAM2 = "param2"
  */
 class DetailedWeatherFragment : Fragment() {
     // TODO: Rename and change types of parameters
+    private var cities = arrayOf("Irkutsk", "Moscow", "Krasnoyarsk", "Krasnodar")
     private var param1: String? = null
     private var param2: String? = null
     private var weather_text: Weather = Weather()
@@ -58,33 +64,27 @@ class DetailedWeatherFragment : Fragment() {
         val view: View = inflater!!.inflate(R.layout.fragment_detailed_weather, container, false)
         val weatherInfoTextView = view.findViewById<TextView>(R.id.weather_info)
         val weatherImageView = view.findViewById<ImageView>(R.id.weather_image)
+        val changeCityButton = view.findViewById<Button>(R.id.change_city_button)
+        var choice = 0
 
-        lifecycleScope.launch {
-            val weather = withContext(Dispatchers.IO) {
-                getWeather(key, lang)
-            }
+        changeCityButton.setOnClickListener(View.OnClickListener {
+            AlertDialog.Builder(view.context).
+            setSingleChoiceItems( arrayOf("Irkutsk", "Moscow", "Krasnoyarsk", "Krasnodar"), 0, {
+                    dialog, which -> choice = which
+            }).
+            setPositiveButton("Ok", {dialog, which ->
+                set_weather_data(weatherInfoTextView, weatherImageView, cities[choice])
+            }).
+            create().show()
+        })
 
-            weatherInfoTextView.text = buildString {
-                append("В Иркутске сегодня ${weather.weather.get(0).description}\n")
-                append("Температура: ${weather.main.temp}°C, ощущается как: ${weather.main.feels_like}°C\n")
-                append("Ветер ${getWindDirection(weather.wind.deg.toDouble()).toLowerCase()}, ${weather.wind.speed} м/с")
-            }
-            val weather_type = weather.weather.get(0).main
-            weatherImageView.setImageResource(when {
-                weather_type.toLowerCase() == "cнег" -> R.drawable.snow
-                weather_type.toLowerCase() == "гроза" -> R.drawable.thunder
-                weather_type.toLowerCase() == "ветрено" -> R.drawable.windy
-                weather_type.toLowerCase() == "дождь" -> R.drawable.rainy
-                else -> R.drawable.clouds_and_sun
-            })
-
-        }
+        set_weather_data(weatherInfoTextView, weatherImageView, "Irkutsk")
 
         return view
     }
 
-    suspend fun getWeather(key: String, lang: String): Weather {
-        val API_URL = "https://api.openweathermap.org/data/2.5/weather?q=Irkutsk&lang=ru&appid=${key}&units=metric"
+    suspend fun getWeather(key: String, lang: String, city: String): Weather {
+        val API_URL = "https://api.openweathermap.org/data/2.5/weather?q=$city&lang=ru&appid=${key}&units=metric"
 
         val stream = URL(API_URL).getContent() as InputStream
         // JSON отдаётся одной строкой,
@@ -109,6 +109,29 @@ class DetailedWeatherFragment : Fragment() {
         }
     }
 
+    fun set_weather_data(weatherInfoTextView: TextView, weatherImageView: ImageView, city: String){
+        lifecycleScope.launch {
+            val weather = withContext(Dispatchers.IO) {
+                getWeather(key, lang, city)
+            }
+
+            weatherInfoTextView.text = buildString {
+                append("В $city сегодня ${weather.weather.get(0).description}\n")
+                append("Температура: ${weather.main.temp}°C, ощущается как: ${weather.main.feels_like}°C\n")
+                append("Ветер ${getWindDirection(weather.wind.deg.toDouble()).toLowerCase()}, ${weather.wind.speed} м/с")
+            }
+            val weather_type = weather.weather.get(0).main
+            weatherImageView.setImageResource(when {
+                weather_type.toLowerCase() == "cнег" -> R.drawable.snow
+                weather_type.toLowerCase() == "гроза" -> R.drawable.thunder
+                weather_type.toLowerCase() == "ветрено" -> R.drawable.windy
+                weather_type.toLowerCase() == "дождь" -> R.drawable.rainy
+                else -> R.drawable.clouds_and_sun
+            })
+
+        }
+    }
+
     companion object {
         /**
          * Use this factory method to create a new instance of
@@ -128,4 +151,18 @@ class DetailedWeatherFragment : Fragment() {
                 }
             }
     }
+
+//    fun change_city(view: View) {
+//        val myDialog = MyDialog(view.context)
+//        fragmentManager?.let { myDialog.show(it, "city_choice") }
+//    }
+//
+//    override fun onClick(dialog: DialogInterface?, which: Int) {
+//        val textView =
+//        when (which){
+//            DialogInterface.BUTTON_POSITIVE -> textView.setText("Вы согласились!");
+//        }
+//
+//    }
+
 }

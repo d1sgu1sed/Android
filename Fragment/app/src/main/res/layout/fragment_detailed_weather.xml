@@ -28,7 +28,18 @@
         android:src="@drawable/rainy"
         android:layout_marginStart="130dp"
         android:layout_marginTop="20dp"
-            />
+        />
+
+    <Button
+        android:id="@+id/change_city_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/weather_image"
+        app:layout_constraintTop_toBottomOf="@id/weather_image"
+        android:layout_marginTop="200dp"
+        android:layout_marginStart="-40dp"
+        android:text="Выбрать город"
+        />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
