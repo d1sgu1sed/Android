@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Zhdun</string>
+    <string name="waiting_text">время созерцания: %1$d мин.</string>
+    <string name="tired_text">Надоело ждать?</string>
+    <string name="toast_text">Ждун уходит в отпуск!</string>
+    <string name="low_battery_text">накормите Ждуна, силы на исходе!</string>
+
+</resources>

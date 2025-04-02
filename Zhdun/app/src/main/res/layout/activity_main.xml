@@ -1,0 +1,29 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable
+            name="vm"
+            type="com.example.zhdun.WaitingViewModel" />
+    </data>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:padding="24dp">
+
+        <TextView
+            android:id="@+id/textView"
+            android:textSize="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text='@{vm.isLowBattery ? @string/low_battery_text : String.format(@string/waiting_text, vm.minutes)}' />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_marginTop="24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tired_text"/>
+    </LinearLayout>
+</layout>
