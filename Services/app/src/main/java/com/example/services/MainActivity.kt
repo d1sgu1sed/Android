@@ -1,12 +1,18 @@
 package com.example.services
 
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.Manifest
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
@@ -20,14 +26,35 @@ class MainActivity : AppCompatActivity() {
 
 
 
+    private val requestNotificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+            } else {
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         NotificationUtils.createNotificationChannel(this)
 
+        checkNotificationPermission()
+
         initViewModel()
         initView()
+    }
+
+    private fun checkNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -59,6 +86,7 @@ class MainActivity : AppCompatActivity() {
             val startRate = viewModel.usdRate.value
 
             if (targetRate.isNotEmpty() && startRate?.isNotEmpty() == true) {
+                Log.d("service", "service started")
                 RateCheckService.stopService(this)
                 RateCheckService.startService(this, startRate, targetRate)
             } else if (targetRate.isEmpty()) {

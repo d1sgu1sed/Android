@@ -9,7 +9,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.example.services.R
 
 object NotificationUtils {
-    private const val CHANNEL_ID = "rate_changes"
+    const val CHANNEL_ID = "rate_changes"
     private const val CHANNEL_NAME = "Rate Change Alerts"
 
     fun createNotificationChannel(context: Context) {
