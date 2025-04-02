@@ -7,4 +7,4 @@
 ![image](./screen2.jpg)
 
 ## 3:
-![image](./screen3.jpg)
+![image](./screen3.png)
