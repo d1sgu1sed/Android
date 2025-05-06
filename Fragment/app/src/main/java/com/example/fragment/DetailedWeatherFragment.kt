@@ -2,6 +2,7 @@ package com.example.fragment
 
 import android.app.AlertDialog
 import android.content.DialogInterface
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -12,6 +13,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
@@ -21,11 +23,14 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.w3c.dom.Text
+import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.Date
 import java.util.Scanner
+import kotlin.io.path.Path
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -109,10 +114,42 @@ class DetailedWeatherFragment : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun set_weather_data(weatherInfoTextView: TextView, weatherImageView: ImageView, city: String){
         lifecycleScope.launch {
             val weather = withContext(Dispatchers.IO) {
                 getWeather(key, lang, city)
+            }
+            val fileName = "weather.json"
+            val tenMinutesInMillis = 10 * 60 * 1000
+
+            view?.context?.filesDir?.let { fileDir ->
+                val filePath = Path(fileDir.path, fileName)
+                val file = filePath.toFile()
+
+                val shouldUpdate = !file.exists() || (Date().time - file.lastModified() > tenMinutesInMillis)
+
+                if (shouldUpdate) {
+                    try {
+                        val gson = Gson() // Create Gson instance
+                        val jsonString = gson.toJson(weather) // Convert Weather to JSON using Gson
+                        FileOutputStream(file).use { output ->
+                            output.write(jsonString.toByteArray())
+                        }
+                        Log.d("WeatherFileGson", "Weather data saved to file (Gson): ${file.absolutePath}")
+                    } catch (e: Exception) {
+                        Log.e("WeatherFileGson", "Error writing weather data to file (Gson): ${e.message}")
+                        e.printStackTrace()
+                    }
+                } else {
+                    Log.d("WeatherFileGson", "Weather data is recent enough, not updating file (Gson).")
+                }
+
+                Log.d("fileDir", "filepath ${fileDir}")
+                Log.d("path_to_file", "filepath: $filePath")
+
+            } ?: run {
+                Log.e("WeatherFileGson", "Context or filesDir is null. Cannot save weather data (Gson).")
             }
 
             weatherInfoTextView.text = buildString {
